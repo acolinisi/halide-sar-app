@@ -3,6 +3,8 @@
 #include "ImgPlane.h"
 #include "ip.h"
 
+#include "fftw.h"
+
 #include <cnpy.h>
 
 #include <chrono>
@@ -75,6 +77,24 @@ void load(double *d_u, double *d_v) {
     } else {
         throw runtime_error("Bad word size: R_c");
     }
+
+    cout << "X length: " << nu << endl;
+    cout << "Y length: " << nv << endl;
+
+    // Compute FFT width (power of 2)
+    int N_fft = static_cast<int>(pow(2, static_cast<int>(log2(pd.nsamples * upsample)) + 1));
+
+}
+
+void init_fft(int N_fft) {
+    // FFTW: init shared context
+    dft_init_fftw(static_cast<size_t>(N_fft));
+
+}
+
+void destroy_fft() {
+    // FFTW: clean up shared context
+    dft_destroy_fftw();
 }
 
 #if 1

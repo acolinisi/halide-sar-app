@@ -211,6 +211,26 @@ public:
 
         // output_img: produce shape {nu, nv}, but reverse row order
         output_img(c, x, y) = fimg.inner(c, (nu * (nv - y - 1)) + x);
+
+#if 1
+        int NPULSES = 469;
+        int NSAMPLES = 424;
+        phs.dim(0).set_stride(NSAMPLES * NPULSES);
+        phs.dim(1).set_stride(NPULSES);
+        phs.dim(2).set_stride(1);
+
+        pos.dim(0).set_stride(NPULSES);
+        pos.dim(1).set_stride(1);
+
+        r.dim(0).set_stride(3); /* fixed dim size */
+        r.dim(1).set_stride(1);
+
+        int NU = 512;
+        int NV = 512;
+        output_img.dim(0).set_stride(NU * NV); /* last*second dim */
+        output_img.dim(1).set_stride(NV); /* second dim */
+        output_img.dim(2).set_stride(1); /* last dim */
+#endif
     }
 
     void schedule() {

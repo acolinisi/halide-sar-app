@@ -9,7 +9,7 @@
 
 #include <cnpy.h>
 
-#include "dft.h"
+#include "fftw.h"
 #include "PlatformData.h"
 #include "ImgPlane.h"
 

@@ -61,20 +61,10 @@ int main(int argc, char **argv) {
         // TODO: is there a way to get sizes without loading the data?
 
 #if 1
-	Dat *phs = &tg.createFloatDat(3, {2, nsamples, npulses}); // float, d=3
-	Dat *k_r = &tg.createDat(1, nsamples); // float
-
-	IntScalar *taylor = &tg.createIntScalar(64, 17);
-
         // Compute FFT width (power of 2)
         int N_fft_val = static_cast<int>(pow(2,
                     static_cast<int>(log2(nsamples * upsample)) + 1));
 	IntScalar *N_fft = &tg.createIntScalar(64, N_fft_val);
-
-	DoubleScalar *delta_r = &tg.createDoubleScalar(delta_r_p);
-
-	Dat *pos = &tg.createFloatDat(2, {3, npulses}); // float, dim 2
-	Dat *r = &tg.createDoubleDat(2, {nu*nv, 3}); // double, dim 2
 
 #endif
 	//DoubleScalar *res_factor = &tg.createDoubleScalar(RES_FACTOR);
@@ -121,18 +111,51 @@ int main(int argc, char **argv) {
         Task& task_ip_u_hat = tg.createTask(HalideKernel("ip_u_hat"),
                 {v_hat, n_hat, u_hat}, {&task_ip_v_hat});
 
-	Dat *pixel_locs = &tg.createDoubleDat(2, {nu * nv, 3});
+	Dat *r = &tg.createDoubleDat(2, {nu*nv, 3}); // double, dim 2
+#if 1
         Task& task_ip_pixel_locs = tg.createTask(HalideKernel("ip_pixel_locs"),
-                {u, v, u_hat, v_hat, pixel_locs},
+                {u, v, u_hat, v_hat, r},
                 {&task_ip_u_hat, &task_ip_uv_u, &task_ip_uv_v});
+#endif
 
+        Task& task_init_fft = tg.createTask(CKernel("init_fft"), {N_fft},
+			{&task_ip_u_hat} /* TODO: task_ip_pixel_locs */);
+
+#if 0
+	int rv = backprojection_impl(pd.phs, pd.k_r, taylor, N_fft, pd.delta_r,
+		ip.u, ip.v, pd.pos, ip.pixel_locs, buf_bp);
+#endif
+
+#endif
+
+#if 1
+	Dat *phs = &tg.createFloatDat(3, {2, nsamples, npulses}); // float, d=3
+	Dat *k_r = &tg.createFloatDat(1, {nsamples}); // float
+	IntScalar *taylor = &tg.createIntScalar(64, 17);
+	DoubleScalar *delta_r = &tg.createDoubleScalar(delta_r_p);
+	Dat *pos = &tg.createFloatDat(2, {3, npulses}); // float, dim 2
+	Dat *bp = &tg.createDoubleDat(3, {2, nu, nv});
+
+#if 1
+	Task& task_bp = tg.createTask(HalideKernel("backprojection"),
+                        {phs, k_r, taylor, N_fft, delta_r, u, v, pos, r, bp},
+			{&task_init_fft});
+#endif
+#endif
+
+#if 1
+        Task& task_destroy_fft = tg.createTask(CKernel("destroy_fft"), {},
+		{&task_bp});
 #endif
 
 #if 0
-	Task& task_bp = tg.createTask(HalideKernel("backprojection"),
-                        {phs, k_r, taylor, N_fft, delta_r, u, v, pos, r},
-			{});
+	Dat *bp_dB = &tg.createDoubleDat(2, {nu, nv});
+	Task& task_bp_dB = tg.createTask(HalideKernel("img_output_to_dB"),
+                        {phs, k_r, taylor, N_fft, delta_r, u, v, pos, r, bp},
+			{&task_init_fft});
 #endif
+
+
 
 	return tryCompile(tg, opts);
 }
