@@ -60,6 +60,7 @@ int main(int argc, char **argv) {
 
         // TODO: is there a way to get sizes without loading the data?
 
+#if 1
 	Dat *phs = &tg.createFloatDat(3, {2, nsamples, npulses}); // float, d=3
 	Dat *k_r = &tg.createDat(1, nsamples); // float
 
@@ -72,26 +73,66 @@ int main(int argc, char **argv) {
 
 	DoubleScalar *delta_r = &tg.createDoubleScalar(delta_r_p);
 
-	Dat *u = &tg.createDoubleDat(1, {nu});
-	Dat *v = &tg.createDoubleDat(1, {nv});
 	Dat *pos = &tg.createFloatDat(2, {3, npulses}); // float, dim 2
 	Dat *r = &tg.createDoubleDat(2, {nu*nv, 3}); // double, dim 2
 
+#endif
 	//DoubleScalar *res_factor = &tg.createDoubleScalar(RES_FACTOR);
         // TODO: constructor without a value
 	DoubleScalar *d_u = &tg.createDoubleScalar(0);
 	DoubleScalar *d_v = &tg.createDoubleScalar(0);
 
-        Dat *dummyDat = &tg.createDoubleDat(1, {2});
-        Task& task_load = tg.createTask(CKernel("load"), {dummyDat,
-                d_u, d_v});
+        PtrScalar *d_u_p = &tg.createPtrScalar(d_u);
+        PtrScalar *d_v_p = &tg.createPtrScalar(d_v);
 
-        //Task& task_ip = tg.createTask(HalideKernel("ip_"),
-        //        {});
+        Dat *n_hat = &tg.createFloatDat(1, {3}); // float, d=1
+        Dat *R_c = &tg.createFloatDat(1, {3}); // float, d=1
+        Task& task_load = tg.createTask(CKernel("load"), {d_u_p, d_v_p, n_hat, R_c});
+#if 1
+        Task& task_load_test_ptr = tg.createTask(CKernel("load_test_ptr"),
+                {d_u_p, d_v_p}, {&task_load});
+        Task& task_load_test = tg.createTask(CKernel("load_test"), {d_u, d_v},
+                        {&task_load});
+#endif
 
+#if 1
+	IntScalar *s_nu = &tg.createIntScalar(64, nu);
+	IntScalar *s_nv = &tg.createIntScalar(64, nv);
+
+	Dat *u = &tg.createDoubleDat(1, {nu});
+	Dat *v = &tg.createDoubleDat(1, {nv});
+	Dat *k_u = &tg.createDoubleDat(1, {nu});
+	Dat *k_v = &tg.createDoubleDat(1, {nv});
+
+        Task& task_ip_uv_u = tg.createTask(HalideKernel("ip_uv"),
+                {s_nu, d_u, u}, {&task_load});
+        Task& task_ip_uv_v = tg.createTask(HalideKernel("ip_uv"),
+                {s_nv, d_v, v}, {&task_load});
+        Task& task_ip_k_u = tg.createTask(HalideKernel("ip_k"),
+                {s_nu, d_u, k_u}, {&task_load});
+        Task& task_ip_k_v = tg.createTask(HalideKernel("ip_k"),
+                {s_nv, d_v, k_v}, {&task_load});
+
+	Dat *u_hat = &tg.createDoubleDat(1, {3});
+	Dat *v_hat = &tg.createDoubleDat(1, {3});
+
+        Task& task_ip_v_hat = tg.createTask(HalideKernel("ip_v_hat"),
+                {n_hat, R_c, v_hat}, {&task_load});
+        Task& task_ip_u_hat = tg.createTask(HalideKernel("ip_u_hat"),
+                {v_hat, n_hat, u_hat}, {&task_ip_v_hat});
+
+	Dat *pixel_locs = &tg.createDoubleDat(2, {nu * nv, 3});
+        Task& task_ip_pixel_locs = tg.createTask(HalideKernel("ip_pixel_locs"),
+                {u, v, u_hat, v_hat, pixel_locs},
+                {&task_ip_u_hat, &task_ip_uv_u, &task_ip_uv_v});
+
+#endif
+
+#if 0
 	Task& task_bp = tg.createTask(HalideKernel("backprojection"),
                         {phs, k_r, taylor, N_fft, delta_r, u, v, pos, r},
 			{});
+#endif
 
 	return tryCompile(tg, opts);
 }
