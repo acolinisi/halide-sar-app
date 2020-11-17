@@ -215,20 +215,20 @@ public:
 #if 1
         int NPULSES = 469;
         int NSAMPLES = 424;
-        phs.dim(0).set_stride(NSAMPLES * NPULSES);
-        phs.dim(1).set_stride(NPULSES);
+        phs.dim(0).set_stride(NSAMPLES * NPULSES * 1);
+        phs.dim(1).set_stride(NPULSES * 1);
         phs.dim(2).set_stride(1);
 
-        pos.dim(0).set_stride(NPULSES);
+        pos.dim(0).set_stride(NPULSES * 1);
         pos.dim(1).set_stride(1);
 
-        r.dim(0).set_stride(3); /* fixed dim size */
+        r.dim(0).set_stride(3 * 1); /* fixed dim size */
         r.dim(1).set_stride(1);
 
         int NU = 512;
         int NV = 512;
-        output_img.dim(0).set_stride(NU * NV); /* last*second dim */
-        output_img.dim(1).set_stride(NV); /* second dim */
+        output_img.dim(0).set_stride(NU * NV * 1); /* last*second dim */
+        output_img.dim(1).set_stride(NV * 1); /* second dim */
         output_img.dim(2).set_stride(1); /* last dim */
 #endif
     }

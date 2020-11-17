@@ -40,6 +40,7 @@ casper_add_exec(sarbp sarbp.meta
     ${FFTW3_LIBRARIES}
     ${CNPY}
     Halide::Halide
+    Halide::ImageIO
   PLATFORM platform.ini
   TUNED_PARAMS tuned-params.ini
 )

@@ -6,6 +6,7 @@
 #include "fftw.h"
 
 #include <cnpy.h>
+#include <halide_image_io.h>
 
 #include <chrono>
 #include <iostream>
@@ -95,6 +96,37 @@ void init_fft(int N_fft) {
 void destroy_fft() {
     // FFTW: clean up shared context
     dft_destroy_fftw();
+}
+
+void save(uint8_t *img_dat_buf, uint8_t *img_dat,
+                int img_offset, int img_n, int img_m,
+                int img_s_n, int img_s_m) {
+    // For the interface of Halide::Tools, reconstruct halide_buffer_t from
+    // args and convert to Halide::Buffer.
+    const int dims = 2;
+    halide_dimension_t dim[dims] = {
+        halide_dimension_t{0, img_n, img_s_n},
+        halide_dimension_t{0, img_m, img_s_m},
+    };
+    halide_buffer_t img_hb {
+
+        // TODO: not tracked in casper across memref types
+        .device = 0,
+        .device_interface = NULL,
+        .host = img_dat_buf,
+        .flags = 0,
+
+        // from task interface (dat type in func args above)
+        .type =  halide_type_t{halide_type_uint, /* bits */ 8, /* lanes*/ 1},
+        .dimensions = dims,
+        .dim = dim,
+
+        .padding = NULL,
+    };
+    Halide::Buffer img_b{img_hb};
+
+    std::string output_png{"output_image.png"};
+    Halide::Tools::convert_and_save_image(img_b, output_png);
 }
 
 #if 1

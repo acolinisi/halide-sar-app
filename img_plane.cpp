@@ -102,7 +102,7 @@ public:
 
 #if 1
         // TODO: 
-        pixel_locs.dim(0).set_stride(3); /* second dim */
+        pixel_locs.dim(0).set_stride(3 * 1); /* second dim */
         pixel_locs.dim(1).set_stride(1);
 #endif
     }

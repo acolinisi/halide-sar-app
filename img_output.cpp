@@ -25,6 +25,18 @@ public:
         out(x, y) = Expr(10) * log10(abs(cimg(x, y)) / m());
 
         m.compute_root();
+
+
+#if 1
+        int NU = 512;
+        int NV = 512;
+        img.dim(0).set_stride(NU * NV);
+        img.dim(1).set_stride(NV * 1);
+        img.dim(2).set_stride(1);
+
+        out.dim(0).set_stride(NV * 1);
+        out.dim(1).set_stride(1);
+#endif
     }
 };
 
@@ -38,6 +50,13 @@ public:
     void generate() {
         Var x{"x"}, y{"y"};
         out(x, y) = ConciseCasts::u8(dB_scale(dB(x, y), dB_min, dB_max, UInt(8)));
+
+        int NU = 512;
+        int NV = 512;
+        dB.dim(0).set_stride(NV * 1);
+        dB.dim(1).set_stride(1);
+        out.dim(0).set_stride(NV * 1);
+        out.dim(1).set_stride(1);
     }
 };
 

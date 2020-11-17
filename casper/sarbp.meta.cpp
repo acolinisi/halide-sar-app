@@ -119,12 +119,7 @@ int main(int argc, char **argv) {
 #endif
 
         Task& task_init_fft = tg.createTask(CKernel("init_fft"), {N_fft},
-			{&task_ip_u_hat} /* TODO: task_ip_pixel_locs */);
-
-#if 0
-	int rv = backprojection_impl(pd.phs, pd.k_r, taylor, N_fft, pd.delta_r,
-		ip.u, ip.v, pd.pos, ip.pixel_locs, buf_bp);
-#endif
+			{&task_ip_pixel_locs});
 
 #endif
 
@@ -151,11 +146,21 @@ int main(int argc, char **argv) {
 #if 1
 	Dat *bp_dB = &tg.createDoubleDat(2, {nu, nv});
 	Task& task_bp_dB = tg.createTask(HalideKernel("img_output_to_dB"),
-                        {phs, k_r, taylor, N_fft, delta_r, u, v, pos, r, bp},
-			{&task_init_fft});
+                        {bp, bp_dB},
+			{&task_destroy_fft});
+
+#if 1
+	Dat *bp_u8 = &tg.createIntDat(8, 2, {nu, nv});
+	DoubleScalar *dB_min = &tg.createDoubleScalar(-30.0);
+	DoubleScalar *dB_max = &tg.createDoubleScalar(0.0);
+	Task& task_bp_u8 = tg.createTask(HalideKernel("img_output_u8"),
+                        {bp_dB, dB_min, dB_max, bp_u8},
+			{&task_bp_dB});
+#endif
 #endif
 
-
+        Task& task_save = tg.createTask(CKernel("save"), {bp_u8},
+		{&task_bp_u8});
 
 	return tryCompile(tg, opts);
 }
