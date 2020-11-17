@@ -26,11 +26,11 @@ include_directories(..)
 add_library(dft ../dft.cpp ../fftw.cpp)
 #target_link_libraries(dft PUBLIC Halide::Halide Halide::ImageIO)
 
-#../img_output.cpp
 casper_add_exec(sarbp sarbp.meta
   SOURCES
     sarbp.meta.cpp
     ../backprojection.cpp
+    ../img_output.cpp
     ../img_plane.cpp
   C_KERNEL_SOURCES kern.cpp ../PlatformData.cpp
   EXTRA_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/..

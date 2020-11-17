@@ -148,7 +148,7 @@ int main(int argc, char **argv) {
 		{&task_bp});
 #endif
 
-#if 0
+#if 1
 	Dat *bp_dB = &tg.createDoubleDat(2, {nu, nv});
 	Task& task_bp_dB = tg.createTask(HalideKernel("img_output_to_dB"),
                         {phs, k_r, taylor, N_fft, delta_r, u, v, pos, r, bp},
