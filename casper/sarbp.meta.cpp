@@ -76,8 +76,11 @@ int main(int argc, char **argv) {
         PtrScalar *d_v_p = &tg.createPtrScalar(d_v);
 
         Dat *n_hat = &tg.createFloatDat(1, {3}); // float, d=1
+        Dat *k_r = &tg.createFloatDat(1, {nsamples}); // float
         Dat *R_c = &tg.createFloatDat(1, {3}); // float, d=1
-        Task& task_load = tg.createTask(CKernel("load"), {d_u_p, d_v_p, n_hat, R_c});
+        Dat *pos = &tg.createFloatDat(2, {3, npulses}); // float, dim 2
+        Dat *phs = &tg.createFloatDat(3, {2, nsamples, npulses}); // float, d=3
+        Task& task_load = tg.createTask(CKernel("load"), {d_u_p, d_v_p, n_hat, k_r, R_c, pos, phs});
 #if 1
         Task& task_load_test_ptr = tg.createTask(CKernel("load_test_ptr"),
                 {d_u_p, d_v_p}, {&task_load});
@@ -124,11 +127,8 @@ int main(int argc, char **argv) {
 #endif
 
 #if 1
-	Dat *phs = &tg.createFloatDat(3, {2, nsamples, npulses}); // float, d=3
-	Dat *k_r = &tg.createFloatDat(1, {nsamples}); // float
 	IntScalar *taylor = &tg.createIntScalar(64, 17);
 	DoubleScalar *delta_r = &tg.createDoubleScalar(delta_r_p);
-	Dat *pos = &tg.createFloatDat(2, {3, npulses}); // float, dim 2
 	Dat *bp = &tg.createDoubleDat(3, {2, nu, nv});
 
 #if 1
