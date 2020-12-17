@@ -11,11 +11,67 @@
 #include <chrono>
 #include <iostream>
 #include <complex>
+#include <cstdint>
 
 using namespace std;
 using namespace std::chrono;
 
 extern "C" {
+
+#if 0
+void backprojection_dummy(
+        float *phs_dat_buf, float *phs_dat, int phs_offset,
+		int phs_n0, int phs_s_n0,
+		int phs_n1, int phs_s_n1,
+		int phs_n2, int phs_s_n2,
+        float *k_r_dat_buf, float *k_r_dat, int k_r_offset,
+		int k_r_n, int k_r_s_n,
+        int64_t taylor,
+        int64_t N_fft,
+        double delta_r,
+        double *u_dat_buf, double *u_dat, int u_offset,
+		int u_n, int u_s_n,
+        double *v_dat_buf, double *v_dat, int v_offset,
+		int v_n, int v_s_n,
+        float *pos_dat_buf, float *pos_dat, int pos_offset,
+		int pos_n0, int pos_s_n0,
+		int pos_n1, int pos_s_n1,
+        double *r_dat_buf, double *r_dat, int r_offset,
+		int r_n0, int r_s_n0,
+		int r_n1, int r_s_n1,
+        double *bp_dat_buf, double *bp_dat, int bp_offset,
+		int bp_n0, int bp_s_n0,
+		int bp_n1, int bp_s_n1,
+		int bp_n2, int bp_s_n2
+        )
+{
+}
+
+void post_bp(
+        double *bp_dat_buf, double *bp_dat, int bp_offset,
+		int bp_n0, int bp_s_n0,
+		int bp_n1, int bp_s_n1,
+		int bp_n2, int bp_s_n2
+        )
+{
+}
+
+void ip_pixel_locs_dummy(
+        double *u_dat_buf, double *u_dat, int u_offset,
+		int u_n, int u_s_n,
+        double *v_dat_buf, double *v_dat, int v_offset,
+		int v_n, int v_s_n,
+        double *u_hat_dat_buf, double *u_hat_dat, int u_hat_offset,
+		int u_hat_n, int u_hat_s_n,
+        double *v_hat_dat_buf, double *v_hat_dat, int v_hat_offset,
+		int v_hat_n, int v_hat_s_n,
+        double *r_dat_buf, double *r_dat, int r_offset,
+		int r_n0, int r_s_n0,
+		int r_n1, int r_s_n1
+        )
+{
+}
+#endif
 
 #if 1
 void load(

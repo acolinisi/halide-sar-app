@@ -119,6 +119,10 @@ int main(int argc, char **argv) {
         Task& task_ip_pixel_locs = tg.createTask(HalideKernel("ip_pixel_locs"),
                 {u, v, u_hat, v_hat, r},
                 {&task_ip_u_hat, &task_ip_uv_u, &task_ip_uv_v});
+#else
+	Task& task_ip_pixel_locs = tg.createTask(CKernel("ip_pixel_locs_dummy"),
+                {u, v, u_hat, v_hat, r},
+                {&task_ip_u_hat, &task_ip_uv_u, &task_ip_uv_v});
 #endif
 
         Task& task_init_fft = tg.createTask(CKernel("init_fft"), {N_fft},
@@ -126,7 +130,6 @@ int main(int argc, char **argv) {
 
 #endif
 
-#if 1
 	IntScalar *taylor = &tg.createIntScalar(64, 17);
 	DoubleScalar *delta_r = &tg.createDoubleScalar(delta_r_p);
 	Dat *bp = &tg.createDoubleDat(3, {2, nu, nv});
@@ -135,7 +138,15 @@ int main(int argc, char **argv) {
 	Task& task_bp = tg.createTask(HalideKernel("backprojection"),
                         {phs, k_r, taylor, N_fft, delta_r, u, v, pos, r, bp},
 			{&task_init_fft});
+#else
+	Task& task_bp = tg.createTask(CKernel("backprojection_dummy"),
+                        {phs, k_r, taylor, N_fft, delta_r, u, v, pos, r, bp},
+			{&task_init_fft});
 #endif
+
+#if 0
+	Task& task_post_bp = tg.createTask(CKernel("post_bp"),
+                        {bp}, {&task_bp});
 #endif
 
 #if 1
