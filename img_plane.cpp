@@ -99,12 +99,6 @@ public:
         // produces shapes {uv_extent, 3}
         RDom r(0, 2, "r");
         pixel_locs(x, y) = sum(A(r, y) * b(x, r));
-
-#if 1
-        // TODO: 
-        pixel_locs.dim(0).set_stride(3 * 1); /* second dim */
-        pixel_locs.dim(1).set_stride(1);
-#endif
     }
 };
 
